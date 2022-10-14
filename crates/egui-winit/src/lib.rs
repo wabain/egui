@@ -39,9 +39,12 @@ pub fn screen_size_in_pixels(window: &winit::window::Window) -> egui::Vec2 {
     egui::vec2(size.width as f32, size.height as f32)
 }
 
+pub type RawKeyboardInterceptor = dyn FnMut(&winit::event::KeyboardInput);
+
 /// Handles the integration between egui and winit.
 pub struct State {
     start_time: instant::Instant,
+    raw_keyboard_interceptor: Option<Box<RawKeyboardInterceptor>>,
     egui_input: egui::RawInput,
     pointer_pos_in_points: Option<egui::Pos2>,
     any_pointer_button_down: bool,
@@ -77,6 +80,7 @@ impl State {
 
         Self {
             start_time: instant::Instant::now(),
+            raw_keyboard_interceptor: None,
             egui_input,
             pointer_pos_in_points: None,
             any_pointer_button_down: false,
@@ -89,6 +93,10 @@ impl State {
             simulate_touch_screen: false,
             pointer_touch_id: None,
         }
+    }
+
+    pub fn set_raw_keyboard_interceptor(&mut self, interceptor: Box<RawKeyboardInterceptor>) {
+        self.raw_keyboard_interceptor = Some(interceptor);
     }
 
     /// Call this once a graphics context has been created to update the maximum texture dimensions
@@ -215,6 +223,10 @@ impl State {
                 }
             }
             WindowEvent::KeyboardInput { input, .. } => {
+                if let Some(interceptor) = &mut self.raw_keyboard_interceptor {
+                    interceptor(input);
+                }
+
                 self.on_keyboard_input(input);
                 egui_ctx.wants_keyboard_input()
                     || input.virtual_keycode == Some(winit::event::VirtualKeyCode::Tab)

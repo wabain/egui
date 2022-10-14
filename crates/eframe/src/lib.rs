@@ -63,6 +63,9 @@
 // Re-export all useful libraries:
 pub use {egui, egui::emath, egui::epaint};
 
+#[cfg(not(target_arch = "wasm32"))]
+pub use egui_winit::RawKeyboardInterceptor;
+
 #[cfg(feature = "glow")]
 pub use {egui_glow, glow};
 

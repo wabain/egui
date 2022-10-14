@@ -287,6 +287,10 @@ mod glow_integration {
                 wgpu_render_state: None,
             });
 
+            if let Some(hook) = app.create_raw_keyboard_interceptor(&integration.egui_ctx) {
+                integration.set_raw_keyboard_interceptor(hook);
+            }
+
             if app.warm_up_enabled() {
                 integration.warm_up(app.as_mut(), gl_window.window());
             }

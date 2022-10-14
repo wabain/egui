@@ -350,6 +350,13 @@ impl EpiIntegration {
             storage.flush();
         }
     }
+
+    pub(crate) fn set_raw_keyboard_interceptor(
+        &mut self,
+        hook: Box<egui_winit::RawKeyboardInterceptor>,
+    ) {
+        self.egui_winit.set_raw_keyboard_interceptor(hook);
+    }
 }
 
 #[cfg(feature = "persistence")]

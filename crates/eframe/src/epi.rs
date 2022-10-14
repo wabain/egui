@@ -155,6 +155,17 @@ pub trait App {
     ///
     /// Can be used to access pixel data with `get_pixels`
     fn post_rendering(&mut self, _window_size_px: [u32; 2], _frame: &Frame) {}
+
+    /// Called on startup to get an optional interceptor hook to run when
+    /// keyboard input is received.
+    #[cfg(not(target_arch = "wasm32"))]
+    fn create_raw_keyboard_interceptor(
+        &mut self,
+        ctx: &egui::Context,
+    ) -> Option<Box<crate::RawKeyboardInterceptor>> {
+        let _ = ctx;
+        None
+    }
 }
 
 /// Selects the level of hardware graphics acceleration.
